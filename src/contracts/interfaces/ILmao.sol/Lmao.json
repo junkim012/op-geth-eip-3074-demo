@@ -1,0 +1,58 @@
+{
+  "_format": "hh-sol-artifact-1",
+  "contractName": "Lmao",
+  "sourceName": "contracts/interfaces/ILmao.sol",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "_targetChainId",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "_targetContractAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_originTokenAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_originTokenAmount",
+          "type": "uint256"
+        }
+      ],
+      "name": "executeBridgeOrigin",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "sequence",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "payable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes",
+          "name": "encodedVm",
+          "type": "bytes"
+        }
+      ],
+      "name": "receiveBridge",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {}
+}
