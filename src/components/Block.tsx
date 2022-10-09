@@ -3,7 +3,7 @@ import { ethers, Signer } from 'ethers'
 import React, { ReactNode, useEffect, useState } from 'react'
 import { BsTrash } from 'react-icons/bs'
 import { GiTwinShell } from 'react-icons/gi'
-import LmaoABI from '../contracts/Lmao.sol/Lmao.json';
+// import LmaoABI from '../contracts/Lmao.sol/Lmao.json';
 import { useContract, useSigner } from 'wagmi';
 import { config, networkConfig } from '../config';
 import { FormControl, InputLabel, MenuItem, TextField } from '@mui/material';
@@ -35,11 +35,11 @@ export default function Block({ blocks, setBlocks, id, index, removeBlock }: Blo
 
     const { data: signer, isError, isLoading } = useSigner();
 
-    const goerliLmaoContract = useContract({
-        addressOrName: contractAddress,
-        contractInterface: LmaoABI.abi,
-        signerOrProvider: signer
-    })
+    // const goerliLmaoContract = useContract({
+    //     addressOrName: contractAddress,
+    //     contractInterface: LmaoABI.abi,
+    //     signerOrProvider: signer
+    // })
 
 
     // configure contract addresses 

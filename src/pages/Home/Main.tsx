@@ -4,7 +4,7 @@ import { BsTrash } from 'react-icons/bs'
 import { useContractWrite, useContract, useSigner } from 'wagmi'
 
 import Container from '../../components/Container'
-import Block from '../../components/Block'
+// import Block from '../../components/Block'
 import List from '../../components/List'
 import NewList from '../../components/NewList' 
 import xHolas from '../../assets/xHolas.svg'
@@ -13,6 +13,8 @@ import { ethers } from "ethers"
 
 import { XHolas, XHolas__factory } from '../../../types'
 import XHolasABI from '../../contracts/xHolas.json' 
+
+import TxBlock from "../../components/TxBlock.jsx"
 // assert {type: 'json'}
 
 // import detectEthereumProvider from '@metamask/detect-provider';
@@ -225,33 +227,10 @@ export default function HomePageMain() {
   return (
     <Container>
       <section>
-        <div className="">
-          <div className="py-6 px-10">
-            <h2 className="text-[#7b3fe4] text-xl font-semibold">Send a Transaction with Sponsored Gas Fees!</h2>
-          </div>
-          <div className="flex flex-col space-y-2 py-4">
-            {/* <List blocks={blocks} removeBlock={removeBlock}></List> */}
-            <NewList blocks={blocks} setBlocks={setBlocks} removeBlock={removeBlock}></NewList>
-            {/* {blocks.length ? blocks.map((block, idx) => (
-                // <BlockRow key={`${block.name}_${idx}`} block={block} index={idx}/>
-                <Block key={idx} defaultName={block.defaultName} defaultChain={block.defaultChain} index={idx} removeBlock={removeBlock}></Block>
-              )
-            ) : <></>} */}
-          </div>
-        </div>
-        <div className="py-10  flex flex-col space-y-2 items-center justify-center">
-          <div className="hover:scale-110 duration-200 origin-center">
-            <button onClick={addBlock} className="mb-10 origin-center scale-110 duration-200 ">
-              <IoIosAddCircleOutline className="scale-150 origin-center duration-200 "/>
-            </button>
-          </div>
-          
 
-          <button onClick={executeBlocks}>
-            <div className="inline-block align-middle hover:scale-125 duration-200 ">
-                <img src={xHolas} alt="xHolasLogo" className="h-full w-full max-h-12" />
-              </div>
-          </button>
+        <div className="py-10  flex flex-col space-y-2 items-center justify-center">
+        <TxBlock></TxBlock>
+          
         </div>
       </section>
     </Container>

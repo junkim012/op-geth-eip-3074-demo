@@ -12,6 +12,7 @@ import {
   configureChains,
   createClient,
   WagmiConfig,
+  Chain
 } from 'wagmi'
 // import { alchemyProvider } from 'wagmi/providers/alchemy'
 import { publicProvider } from 'wagmi/providers/public'
@@ -24,9 +25,25 @@ import { persistor, store } from './states'
 import theme from './theme'
 // import { fantomChain, fantomTestnetChain } from './utils/rainbow-chains'
 
+const localhost8545: Chain = {
+  id: 1234,
+  name: "EIP-3074", 
+  network: "eip3074",
+  nativeCurrency: {
+    name: "Ethereum",
+    symbol: "ETH", 
+    decimals: 18
+  },
+  rpcUrls: {
+    public: "http://localhost:8545",
+    default: "http://localhost:8545"
+  },
+  testnet: true
+}
+
 const { chains, provider } = configureChains(
   [
-    chain.goerli, chain.polygonMumbai,
+    chain.goerli, chain.polygonMumbai, localhost8545
   ],
   [
     // alchemyProvider({ alchemyId: process.env.ALCHEMY_ID }),
