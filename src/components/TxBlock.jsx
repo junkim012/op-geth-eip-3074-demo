@@ -55,15 +55,30 @@ export default function TxBlock() {
     //     if (!signer || !contract) return; 
     //     const tx = 
     // }
-    const invokerAddress = "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"; 
+    const invokerAddress = "0xaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
     const ownAddress = ""
     const privateKey = "9ad24de184bb9bd3057c3a4625042b26f4ce90f1aef321252f0069c5887e2e54";
-    
+
+    async function sponsorCall() {
+        if (typeof window.ethereum !== 'undefined') {
+
+        }
+    }
+
     async function query() {
         if (typeof window.ethereum !== 'undefined') {
-            const provider = new ethers.providers.Web3Provider(window.ethereum); 
-            const wallet = new ethers.Wallet(privateKey); 
-            const walletSigner = wallet.connect(provider); 
+
+            const storageContractAddress = "0x000000000000000000000000000000000000bbbb";
+
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const wallet = new ethers.Wallet(privateKey);
+            const walletSigner = wallet.connect(provider);
+
+            const paddedSlot = utils.hexZeroPad(slot, 32);
+            const storageLocation = await ethers.provider.getStorageAt(storageContractAddress, paddedSlot);
+            console.log('storageLocation: ', storageLocation);
+            const storageValue = BigNumber.from(storageLocation);
+            console.log('storageValue: ', storageValue);
         }
     }
 
@@ -73,7 +88,7 @@ export default function TxBlock() {
         if (typeof window.ethereum !== 'undefined') {
             console.log('inside window.ethereum');
             const provider = new ethers.providers.Web3Provider(window.ethereum);
-            console.log('provider: ', provider); 
+            console.log('provider: ', provider);
             const signer = provider.getSigner();
             const wallet = new ethers.Wallet(privateKey);
             const walletSigner = wallet.connect(provider);
@@ -89,8 +104,8 @@ export default function TxBlock() {
             }
             console.log('tx: ', tx);
 
-            const receipt = await walletSigner.sendTransaction(tx); 
-            console.log(receipt); 
+            const receipt = await walletSigner.sendTransaction(tx);
+            console.log(receipt);
 
             // walletSigner.sendTransaction(tx).then((transaction) => {
             //     console.dir(transaction)
@@ -123,6 +138,9 @@ export default function TxBlock() {
                     Authorize
                 </button>
             </form>
+            <button onClick={query}>
+                Check Storage Contract
+            </button>
 
 
         </div>
