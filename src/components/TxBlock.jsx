@@ -5,7 +5,8 @@ import { useContract, useSigner, usePrepareSendTransaction, useSendTransaction, 
 import { useDebounce } from 'use-debounce';
 import OwnMeABI from '../contracts/OwnMe.json';
 import callerEmoji from '../assets/caller.svg';
-
+import disc from '../assets/disc.svg';
+import confetti from '../assets/confetti.svg';
 
 export default function TxBlock() {
 
@@ -70,7 +71,8 @@ export default function TxBlock() {
     // sponsored transaction metamask wallet is the sponsor
     async function sponsorIndirect(e) {
         e.preventDefault();
-        setIsTxMined(false); 
+        setIsTxMined(false);
+        setIsTxSent(true);
         console.log('window.ethereum: ', window.ethereum);
         if (typeof window.ethereum !== 'undefined') {
             console.log('inside window.ethereum');
@@ -101,12 +103,12 @@ export default function TxBlock() {
             console.log(txSent);
             if (txSent) {
                 setIsTxSent(true);
-            } 
-            await txSent.wait(); 
+            }
+            await txSent.wait();
 
             console.log(`Transaction successful with hash: ${txSent.hash}`);
 
-            const transactionMined = await isTransactionMined(txSent.hash, provider); 
+            const transactionMined = await isTransactionMined(txSent.hash, provider);
             // const txReceipt = await provider.getTransactionReceipt(hash);
             // const txReceipt = await provider.perform("getTransactionReceipt", { hash })
             // console.log('txReceipt: ', txReceipt); 
@@ -131,7 +133,8 @@ export default function TxBlock() {
 
     async function sponsorDirect(e) {
         e.preventDefault();
-        setIsTxMined(false); 
+        setIsTxMined(false);
+        setIsTxSent(true);
 
         if (typeof window.ethereum !== 'undefined') {
             console.log('inside window.ethereum');
@@ -153,14 +156,14 @@ export default function TxBlock() {
             }
             // console.log('tx: ', tx);
 
-            let confirmations = 0; 
+            let confirmations = 0;
             const txSent = await walletSigner.sendTransaction(tx);
-            console.log('txSent: ', txSent); 
+            console.log('txSent: ', txSent);
             if (txSent) {
-                setIsTxSent(true); 
+                setIsTxSent(true);
             }
 
-            await txSent.wait(); 
+            await txSent.wait();
             console.log(`Transaction successful with hash: ${txSent.hash}`);
 
             const hash = txSent.hash;
@@ -185,21 +188,21 @@ export default function TxBlock() {
 
                 <button
                     onClick={(e) => sponsorDirect(e)}
-                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                     Modify Storage Directly
                 </button>
                 <button
                     onClick={(e) => sponsorIndirect(e)}
-                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                     Modify Storage through Invoker
                 </button>
 
                 <button
                     onClick={query}
-                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                     Check Storage Contract
                 </button>
-                <div className="flex flex-col justify-between font-bold mt-2 border rounded p-4">
+                <div className="flex flex-col justify-between font-bold my-2 border rounded p-4">
                     <div>
                         Stored Caller Address:
                     </div>
@@ -219,7 +222,7 @@ export default function TxBlock() {
 
                     </div>
                 </div>
-                <div>
+                <div className="flex flex-col py-8 ">
                     <div className="font-bold">
                         Glossary:
                     </div>
@@ -231,33 +234,41 @@ export default function TxBlock() {
                             Sponsor: 0xF8916A443a6e9c036abB79398B6dc50e202e0321
                         </div>
                     </div>
+                    <div className="flex flex-row justify-center mt-10">
+                        {
+                            isTxSent ? (
+                                <div className="flex flex-row space-x-2">
+                                    <img className="h-16 w-auto animate-spin" src={disc} alt="xHolas" />
+                                    <span className="flex items-center font-bold font-italics">
+                                        Processing Tx...
+                                    </span>
+                                </div>
+                            ) : (
+                                isTxMined ? (
+                                    <div className="flex flex-row space-x-2">
+                                        <img className="h-16 w-auto" src={confetti} alt="xHolas" />
+
+                                        <span className="flex items-center font-bold font-italics">
+                                            Tx Mined!
+                                        </span>
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <div className="flex flex-row space-x-2">
+                                            <img className="h-16 w-auto" src={disc} alt="xHolas" />
+                                            <span className="flex items-center font-bold font-italics">
+                                                Waiting for transaction!
+                                            </span>
+                                        </div>
+
+                                    </div>
+                                )
+                            )
+                        }
+                    </div>
                 </div>
 
-                <div>
 
-                    {
-                        isTxMined ? (
-                            <div>
-                                Tx has been mined!
-                            </div>
-                        ) : (
-                            <div>
-                                Tx has not been mined!
-                            </div>
-                        )
-                        // ) :
-
-                        //     isTxSent ? (
-                        //         <div>
-                        //             Tx Sent and Loading
-                        //         </div>
-                        //     ) : (
-                        //         <div>
-                        //             Waiting to send Tx
-                        //         </div>
-                        //     )
-                    }
-                </div>
 
 
 
