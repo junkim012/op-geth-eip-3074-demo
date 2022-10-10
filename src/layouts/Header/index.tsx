@@ -7,7 +7,7 @@ import holaLogo from '../../assets/hola.svg'
 import Container from '../../components/Container'
 import HeaderNav from '../../components/Header'
 // import useCurrentPath from '../../hooks/useCurrentPath'
-import xHolasLogo from '../../assets/xHolas.svg'
+import disc from '../../assets/disc.svg'
 
 export default function Header() {
   // const currentPath = useCurrentPath()
@@ -15,9 +15,9 @@ export default function Header() {
     <div className="navbar pt-3">
       <Container>
         <HeaderNav.Left>
-          <Link to="/" className="inline-block py-1 px-2">
+          <Link to="/" className="inline-block py-1 px-2 space-x-3">
             <div className="inline-block align-middle">
-              <img src={xHolasLogo} alt="xHolas" className="h-full w-full max-h-12" />
+              <img src={disc} alt="xHolas" className="h-full w-full max-h-12" />
             </div>
             <div className="inline-block text-2xl text-gray-800 whitespace-nowrap tracking-tight align-middle">
               <span className="text-yellow-500 font-bold">Optimism EIP-3074 Demo</span>

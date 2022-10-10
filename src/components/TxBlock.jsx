@@ -4,13 +4,14 @@ import React, { useEffect, useState } from 'react'
 import { useContract, useSigner, usePrepareSendTransaction, useSendTransaction, useWaitForTransaction } from 'wagmi';
 import { useDebounce } from 'use-debounce';
 import OwnMeABI from '../contracts/OwnMe.json';
+import callerEmoji from '../assets/caller.svg';
 
 
 export default function TxBlock() {
 
     const { data: signer } = useSigner();
 
-    const [storageVal, setStorageVal] = useState("hi");
+    const [storageVal, setStorageVal] = useState("?");
 
     const [to, setTo] = React.useState('');
     const [amount, setAmount] = React.useState('');
@@ -20,6 +21,9 @@ export default function TxBlock() {
 
     console.log('debouncedTo: ', debouncedTo);
     console.log('debouncedValue: ', debouncedValue);
+
+    const [isTxSent, setIsTxSent] = useState(false);
+    const [isTxMined, setIsTxMined] = useState(false);
 
 
 
@@ -53,9 +57,20 @@ export default function TxBlock() {
     }
 
 
+    const isTransactionMined = async (hash, provider) => {
+        console.log('hash: ', hash);
+        console.log('provider: ', provider);
+        const txReceipt = await provider.getTransactionReceipt(hash);
+        console.log('txReceipt: ', txReceipt);
+        if (txReceipt && txReceipt.blockNumber) {
+            return txReceipt;
+        }
+    }
+
     // sponsored transaction metamask wallet is the sponsor
     async function sponsorIndirect(e) {
         e.preventDefault();
+        setIsTxMined(false); 
         console.log('window.ethereum: ', window.ethereum);
         if (typeof window.ethereum !== 'undefined') {
             console.log('inside window.ethereum');
@@ -67,30 +82,57 @@ export default function TxBlock() {
 
             let amount = '1';
 
+            const nonce = ethers.utils.hexlify(await provider.getTransactionCount(wallet.address, "latest"));
+            console.log('sponsor indirect nonce: ', nonce);
+
             let tx = {
                 from: wallet.address,
                 to: invokerAddress,
                 value: ethers.utils.parseEther(amount),
                 // nonce: Math.round(Math.random(1, 1000)+1000),
                 // nonce: 123
-                nonce: await provider.getTransactionCount(wallet.address, "latest"),
+                nonce: nonce,
                 gasLimit: 10000000
 
             }
             console.log('tx: ', tx);
 
-            const receipt = await walletSigner.sendTransaction(tx);
-            console.log(receipt);
+            const txSent = await walletSigner.sendTransaction(tx);
+            console.log(txSent);
+            if (txSent) {
+                setIsTxSent(true);
+            } 
+            await txSent.wait(); 
 
-            // walletSigner.sendTransaction(tx).then((transaction) => {
-            //     console.dir(transaction)
-            //     alert("Send finished!")
-            // })
+            console.log(`Transaction successful with hash: ${txSent.hash}`);
+
+            const transactionMined = await isTransactionMined(txSent.hash, provider); 
+            // const txReceipt = await provider.getTransactionReceipt(hash);
+            // const txReceipt = await provider.perform("getTransactionReceipt", { hash })
+            // console.log('txReceipt: ', txReceipt); 
+            // console.log('isTransactionMined: ', transactionMined); 
+            // if (transactionMined) {
+            //     console.log('tx is mined'); 
+            //     setIsTxMined(true);
+            // } else {
+            //     console.log('tx mine failed'); 
+            //     setIsTxMined(false); 
+            // }
+            if (transactionMined) {
+                console.log('tx is mined');
+                setIsTxMined(true);
+            } else {
+                console.log('tx mine failed');
+                setIsTxMined(false);
+            }
+            setIsTxSent(false);
         }
     }
 
     async function sponsorDirect(e) {
         e.preventDefault();
+        setIsTxMined(false); 
+
         if (typeof window.ethereum !== 'undefined') {
             console.log('inside window.ethereum');
             const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -101,16 +143,38 @@ export default function TxBlock() {
 
             let amount = '1';
 
+            const nonce = ethers.utils.hexlify(await provider.getTransactionCount(wallet.address, "latest"));
+            console.log('sponsor direct nonce: ', nonce);
             let tx = {
                 from: wallet.address,
                 to: storageAddress,
                 value: ethers.utils.parseEther(amount),
-                nonce: await provider.getTransactionCount(wallet.address, "latest"),
+                nonce: nonce
             }
-            console.log('tx: ', tx);
+            // console.log('tx: ', tx);
 
-            const receipt = await walletSigner.sendTransaction(tx);
-            console.log(receipt);
+            let confirmations = 0; 
+            const txSent = await walletSigner.sendTransaction(tx);
+            console.log('txSent: ', txSent); 
+            if (txSent) {
+                setIsTxSent(true); 
+            }
+
+            await txSent.wait(); 
+            console.log(`Transaction successful with hash: ${txSent.hash}`);
+
+            const hash = txSent.hash;
+            const transactionMined = await isTransactionMined(hash, provider);
+            console.log('transactionMined: ', transactionMined);
+
+            if (transactionMined) {
+                console.log('tx is mined');
+                setIsTxMined(true);
+            } else {
+                console.log('tx mine failed');
+                setIsTxMined(false);
+            }
+            setIsTxSent(false);
         }
     }
 
@@ -118,34 +182,88 @@ export default function TxBlock() {
     return (
         <div>
             <div className="flex flex-col space-y-4 justify-center text-center">
-              
-                <button 
-                onClick={(e) => sponsorDirect(e)}
-                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+
+                <button
+                    onClick={(e) => sponsorDirect(e)}
+                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                     Modify Storage Directly
                 </button>
-                <button 
-                onClick={(e) => sponsorIndirect(e)}
-                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                <button
+                    onClick={(e) => sponsorIndirect(e)}
+                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                     Modify Storage through Invoker
                 </button>
 
-                <button 
-                onClick={query}
-                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                <button
+                    onClick={query}
+                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
                     Check Storage Contract
                 </button>
-                <div className="flex flex-col">
+                <div className="flex flex-col justify-between font-bold mt-2 border rounded p-4">
                     <div>
-                        Caller Address/msg.sender: 
+                        Stored Caller Address:
                     </div>
-                    {storageVal}
+                    <div className="mt-2 flex flex-row justify-between">
+                        <img className="h-10 w-auto" src={callerEmoji} alt="callerEmoji" />
+                        {/* <div className="align-baseline text-center">
+                            {storageVal}
+                        </div> */}
+                        <div className="flex items-center">
+
+                            {storageVal}
+
+
+
+                            {/* <span class="inline-block align-middle">{storageVal}</span> */}
+                        </div>
+
+                    </div>
                 </div>
-        
-           
+                <div>
+                    <div className="font-bold">
+                        Glossary:
+                    </div>
+                    <div className="py-3">
+                        <div>
+                            EOA: 0xa94f5374fce5edbc8e2a8697c15331677e6ebf0b
+                        </div>
+                        <div>
+                            Sponsor: 0xF8916A443a6e9c036abB79398B6dc50e202e0321
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+
+                    {
+                        isTxMined ? (
+                            <div>
+                                Tx has been mined!
+                            </div>
+                        ) : (
+                            <div>
+                                Tx has not been mined!
+                            </div>
+                        )
+                        // ) :
+
+                        //     isTxSent ? (
+                        //         <div>
+                        //             Tx Sent and Loading
+                        //         </div>
+                        //     ) : (
+                        //         <div>
+                        //             Waiting to send Tx
+                        //         </div>
+                        //     )
+                    }
+                </div>
 
 
-        </div>
+
+
+
+            </div>
         </div >
     )
 
